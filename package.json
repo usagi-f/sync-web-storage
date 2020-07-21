@@ -1,17 +1,28 @@
 {
   "name": "sync-storage",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "Cross domain storage",
+  "main": "dist/index.js",
+  "homepage": "https://github.com/usagi-f/sync-storage",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usagi-f/sync-storage.git"
+  },
+  "author": "@usagi-f",
+  "license": "Apache-2.0",
+  "keywords": [
+    "local",
+    "storage",
+    "cross",
+    "domain"
+  ],
   "scripts": {
     "build": "esbuild --bundle src/index.ts --minify --loader:.ts=ts --outdir=dist",
-    "build:hub": "esbuild --bundle playground/hub/src/index.ts --loader:.ts=ts --outdir=playground/hub/dist",
-    "build:alice": "esbuild --bundle playground/alice/src/index.ts --loader:.ts=ts --outdir=playground/alice/dist",
-    "serve:hub": "serve playground/hub -p 3001",
-    "serve:alice": "serve playground/alice -p 3002"
+    "playground:build:hub": "esbuild --bundle playground/hub/src/index.ts --loader:.ts=ts --outdir=playground/hub/dist",
+    "playground:build:alice": "esbuild --bundle playground/alice/src/index.ts --loader:.ts=ts --outdir=playground/alice/dist",
+    "playground:serve:hub": "serve playground/hub -p 3001",
+    "playground:serve:alice": "serve playground/alice -p 3002"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "uuid": "^8.2.0"
   },
