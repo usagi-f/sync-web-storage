@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default class SyncStorageClient {
   private id: string;
+  private frameId: string;
   private origin: string;
   private requests: {connect: any[]};
   private connected: boolean;
@@ -22,12 +23,12 @@ export default class SyncStorageClient {
   private count: number;
   private timeout: number;
   private listener: (message: MessageEvent) => void;
-  private frameId: string;
   private frame: HTMLIFrameElement;
-  private hub: Window | null;
+  private hub: Window;
 
   constructor(url: string, options?: ClientOptions) {
     this.id        = uuidv4();
+    this.frameId   = `SyncStorageClient-${this.id}`;
     this.origin    = this._getOrigin(url);
     this.requests  = {connect: []};
     this.connected = false;
@@ -35,7 +36,6 @@ export default class SyncStorageClient {
     this.count     = 0;
     this.timeout   = options?.timeout || 5000;
     this.listener  = null;
-    this.frameId   = `SyncStorageClient-${this.id}`;
 
     this._installListener();
 
@@ -43,10 +43,9 @@ export default class SyncStorageClient {
     this._poll();
 
     this.hub = this.frame.contentWindow;
-    document.body.appendChild(this.frame);
   }
 
-  private _getOrigin(url: string): string {
+  private _getOrigin = (url: string): string => {
     if (URL) {
       const hub = new URL(url);
       return hub.origin;
@@ -57,15 +56,17 @@ export default class SyncStorageClient {
     }
   }
 
-  private _createFrame(url: string): HTMLIFrameElement {
+  private _createFrame = (url: string): HTMLIFrameElement => {
     const element = document.createElement('iframe');
     element.id = this.frameId;
-    element.setAttribute('style', 'display:none;');
+    // element.setAttribute('style', 'display:none;');
+
+    document.body.appendChild(element);
     element.src = url;
     return element;
   }
 
-  private _installListener(): void {
+  private _installListener = (): void => {
     this.listener = (message: SyncMessageEvent): void => {
       let response: ResponseData;
       let error: ResponseData['error'];
@@ -115,7 +116,7 @@ export default class SyncStorageClient {
     }
   }
 
-  public onConnect(): Promise<any> {
+  public onConnect = (): Promise<any> => {
     if (this.connected) {
       return Promise.resolve();
     } else if (this.closed) {
@@ -135,7 +136,7 @@ export default class SyncStorageClient {
     })
   }
 
-  private _request(method: Methods, params?: any): Promise<any> {
+  private _request = (method: Methods, params?: any): Promise<any> => {
     if (this.closed) {
       return Promise.reject(new Error('CrossStorageClient has closed'));
     }
@@ -169,7 +170,7 @@ export default class SyncStorageClient {
     })
   }
 
-  private _poll(): void {
+  private _poll = (): void => {
     const targetOrigin = (this.origin === 'null') ? '*' : this.origin;
 
     const interval = setInterval(() => {
@@ -180,27 +181,27 @@ export default class SyncStorageClient {
     }, 1000);
   }
 
-  public set(key: string, value: string): Promise<void> {
+  public set = (key: string, value: string): Promise<void> => {
     return this._request('set', { key, value });
   }
 
-  public get(key: string | string[]): Promise<string> {
+  public get = (key: string | string[]): Promise<string> => {
     return this._request('get', { keys: [...key] });
   }
 
-  public del(key: string | string[]): Promise<void> {
+  public del = (key: string | string[]): Promise<void> => {
     return this._request('del', { keys: [...key] });
   }
 
-  public clear(): Promise<void> {
+  public clear = (): Promise<void> => {
     return this._request('clear');
   }
 
-  public getKeys(): Promise<string[]> {
+  public getKeys = (): Promise<string[]> => {
     return this._request('getKeys');
   }
 
-  public close(): void {
+  public close = (): void => {
     const element = document.getElementById(this.frameId);
     if (element) {
       element.parentNode.removeChild(element);

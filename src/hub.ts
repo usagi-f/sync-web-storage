@@ -19,7 +19,7 @@ export default class SyncStorageHub {
     this.availableMethods = ['get', 'set', 'del', 'clear', 'getKeys'];
   }
 
-  public init(permissions: PermissionArray): void {
+  public init = (permissions: PermissionArray): void => {
     if (this.storage) {
       this.permissions = permissions || [];
       this._installListener();
@@ -29,7 +29,7 @@ export default class SyncStorageHub {
     }
   }
 
-  private _installListener(): void {
+  private _installListener = (): void => {
     const listener = this._listener;
     if (window.addEventListener) {
       window.addEventListener('message', listener, false);
@@ -38,7 +38,7 @@ export default class SyncStorageHub {
     }
   }
 
-  private _listener(message: SyncMessageEvent): void {
+  private _listener = (message: SyncMessageEvent): void => {
     let errorMessage: string;
     let request: RequestData;
     let result: ResponseData['result'];
@@ -78,7 +78,7 @@ export default class SyncStorageHub {
     window.parent.postMessage(JSON.stringify(responseData), targetOrigin);
   }
 
-  private _permitted(origin: string, method: Methods): boolean {
+  private _permitted = (origin: string, method: Methods): boolean => {
     if (this.availableMethods.includes(method)) return false;
 
     this.permissions.forEach(permission => {
@@ -90,11 +90,11 @@ export default class SyncStorageHub {
     return false;
   }
 
-  private _set(params: KeyValueParams): void {
+  private _set = (params: KeyValueParams): void => {
     this.storage.setItem(params.key, params.value);
   }
 
-  private _get(params: KeyArrayParams): string | string[] {
+  private _get = (params: KeyArrayParams): string | string[] => {
     const result = params.keys.map(key => {
       try {
         return this.storage.getItem(key);
@@ -105,17 +105,17 @@ export default class SyncStorageHub {
     return (result.length > 1) ? result : result[0];
   };
 
-  private _del(params: KeyArrayParams): void {
+  private _del = (params: KeyArrayParams): void => {
     params.keys.forEach(key => {
       this.storage.removeItem(key);
     });
   };
 
-  private _clear(): void {
+  private _clear = (): void => {
     this.storage.clear();
   };
 
-  private _getKeys(): string[] {
+  private _getKeys = (): string[] => {
     return [...Array(this.storage.length)].map((_, i) => this.storage.key(i));
   };
 }
