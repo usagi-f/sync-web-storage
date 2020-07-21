@@ -79,15 +79,13 @@ export default class SyncStorageHub {
   }
 
   private _permitted = (origin: string, method: Methods): boolean => {
-    if (this.availableMethods.includes(method)) return false;
+    if (!this.availableMethods.includes(method)) return false;
 
-    this.permissions.forEach(permission => {
+    return this.permissions.some(permission => {
       const match = permission.origin.test(origin);
       const allow = permission.allow.includes(method);
-      if (match && allow) return true;
+      return match && allow;
     });
-
-    return false;
   }
 
   private _set = (params: KeyValueParams): void => {
