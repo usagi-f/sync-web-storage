@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "esbuild --bundle src/index.ts --minify --loader:.ts=ts --outdir=dist",
+    "build:hub": "esbuild --bundle playground/hub/src/index.ts --loader:.ts=ts --outdir=playground/hub/dist",
+    "build:alice": "esbuild --bundle playground/alice/src/index.ts --loader:.ts=ts --outdir=playground/alice/dist",
+    "serve:hub": "serve playground/hub -p 3001",
+    "serve:alice": "serve playground/alice -p 3002"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +16,8 @@
     "uuid": "^8.2.0"
   },
   "devDependencies": {
-    "@types/uuid": "^8.0.0"
+    "@types/uuid": "^8.0.0",
+    "esbuild": "^0.6.5",
+    "serve": "^11.3.2"
   }
 }

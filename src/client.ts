@@ -24,22 +24,25 @@ export default class SyncStorageClient {
   private listener: (message: MessageEvent) => void;
   private frameId: string;
   private frame: HTMLIFrameElement;
-  private hub: WindowProxy | null;
+  private hub: Window | null;
 
-  constructor(url: string, options: ClientOptions) {
+  constructor(url: string, options?: ClientOptions) {
     this.id        = uuidv4();
     this.origin    = this._getOrigin(url);
     this.requests  = {connect: []};
     this.connected = false;
     this.closed    = false;
     this.count     = 0;
-    this.timeout   = options.timeout || 5000;
+    this.timeout   = options?.timeout || 5000;
     this.listener  = null;
     this.frameId   = `SyncStorageClient-${this.id}`;
-    this.frame     = this._createFrame(url);
-    this.hub       = this.frame.contentWindow;
 
     this._installListener();
+
+    this.frame = this._createFrame(url);
+    this._poll();
+
+    this.hub = this.frame.contentWindow;
     document.body.appendChild(this.frame);
   }
 
@@ -68,8 +71,7 @@ export default class SyncStorageClient {
       let error: ResponseData['error'];
 
       // newした時に設定したoriginではない場合は処理しない
-      if (this.closed || origin !== this.origin) return;
-
+      if (this.closed || message.origin !== this.origin) return;
       if (message.data === 'sync-storage:unavailable') {
         if (!this.closed) this.close();
         if (!this.requests.connect) return;
@@ -165,6 +167,17 @@ export default class SyncStorageClient {
 
       this.hub.postMessage(JSON.stringify(request), targetOrigin);
     })
+  }
+
+  private _poll(): void {
+    const targetOrigin = (this.origin === 'null') ? '*' : this.origin;
+
+    const interval = setInterval(() => {
+      if (this.connected) return clearInterval(interval);
+      if (!this.hub) return;
+
+      this.hub.postMessage('cross-storage:poll', targetOrigin);
+    }, 1000);
   }
 
   public set(key: string, value: string): Promise<void> {
