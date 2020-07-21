@@ -1,5 +1,3 @@
-const availableMethods: Methods[] = ['get', 'set', 'del', 'clear', 'getKeys'];
-
 /**
  * @example
  * ```
@@ -14,9 +12,11 @@ const availableMethods: Methods[] = ['get', 'set', 'del', 'clear', 'getKeys'];
 export default class SyncStorageHub {
   private storage: Storage;
   private permissions: PermissionArray;
+  private availableMethods: Methods[];
 
   constructor(storage: Storage) {
     this.storage = storage;
+    this.availableMethods = ['get', 'set', 'del', 'clear', 'getKeys'];
   }
 
   public init(permissions: PermissionArray): void {
@@ -38,18 +38,18 @@ export default class SyncStorageHub {
     }
   }
 
-  private _listener(message: MessageEvent): void {
+  private _listener(message: SyncMessageEvent): void {
     let errorMessage: string;
-    let messageData: MessageData;
-    let result: Function;
+    let request: RequestData;
+    let result: ResponseData['result'];
 
     try {
-      messageData = JSON.parse(message.data);
+      request = JSON.parse(message.data);
     } catch (err) {
       return;
     }
 
-    const event = messageData.method.split('sync-storage:')[1];
+    const event = request.method.split('sync-storage:')[1] as Events;
     if (!event) return;
 
     if (event === 'ready') return;
@@ -60,7 +60,7 @@ export default class SyncStorageHub {
     try {
       const permitted = this._permitted(message.origin, event as Methods);
       if (permitted) {
-        result = this[`_${event}`](messageData.params);
+        result = this[`_${event}`](request.params);
       } else {
         errorMessage = `Invalid permissions for ${event}`;
       }
@@ -68,19 +68,18 @@ export default class SyncStorageHub {
       errorMessage = err.message;
     }
 
-    const response = JSON.stringify({
-      id: messageData.id,
+    const responseData: ResponseData = {
+      id: request.id,
       error: errorMessage,
       result: result,
-    });
-
+    };
     const targetOrigin = (message.origin === 'null') ? '*' : message.origin;
 
-    window.parent.postMessage(response, targetOrigin);
+    window.parent.postMessage(JSON.stringify(responseData), targetOrigin);
   }
 
   private _permitted(origin: string, method: Methods): boolean {
-    if (availableMethods.includes(method)) return false;
+    if (this.availableMethods.includes(method)) return false;
 
     this.permissions.forEach(permission => {
       const match = permission.origin.test(origin);

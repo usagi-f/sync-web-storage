@@ -7,6 +7,7 @@ type EventKeys =
   'sync-storage:del' |
   'sync-storage:clear' |
   'sync-storage:getKeys' |
+  'sync-storage:unavailable' |
   'sync-storage:ready' |
   'sync-storage:poll';
 
@@ -15,10 +16,23 @@ type PermissionArray = Permission[];
 type KeyValueParams = { key: string; value: string };
 type KeyArrayParams = { keys: string[] };
 
-type MessageData = {
-  id: any;
+type MessageId = string; // `${uuid}:${count}`
+type RequestData = {
+  id: MessageId;
   method: EventKeys;
   params: KeyValueParams | KeyArrayParams;
+};
+type ResponseData = {
+  id: MessageId;
+  error: Error | string;
+  result: void | string | string[];
+};
+interface SyncMessageEvent extends MessageEvent {
+  data: string; // JSON.stringify(RequestData | ResponseData)
+}
+
+type ClientOptions = {
+  timeout?: number;
 };
 
 interface  Window {
