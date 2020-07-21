@@ -1,11 +1,23 @@
 type Method = 'get' | 'set' | 'del' | 'clear' | 'getKeys';
+type State = 'ready' | 'poll';
+type Event = Method | State;
+type EventKeys =
+  'sync-storage:get' |
+  'sync-storage:set' |
+  'sync-storage:del' |
+  'sync-storage:clear' |
+  'sync-storage:getKeys' |
+  'sync-storage:ready' |
+  'sync-storage:poll';
+
 type Permission = { origin: RegExp, allow: Method[] };
 type Permissions = Permission[];
 type KeyValueParams = { key: string; value: string };
 type KeyArrayParams = { keys: string[] };
+
 type Request = {
   id: any;
-  method: Method;
+  method: EventKeys;
   params: KeyValueParams | KeyArrayParams;
 };
 
@@ -57,34 +69,35 @@ export default class SyncStorageHub {
     let request: Request;
     let result: Function;
 
-    if (message.data === 'sync-storage:ready') return;
-    if (message.data === 'sync-storage:poll') {
-      return window.parent.postMessage('sync-storage:ready', message.origin);
-    }
     try {
       request = JSON.parse(message.data);
     } catch (err) {
       return;
     }
 
-    const method = request.method.split('sync-storage:')[1] as Method;
-    const permitted = this._permitted(message.origin, method);
+    const event = request.method.split('sync-storage:')[1] as Event;
+    if (!event) return;
 
-    if (!method) return;
-    if (!permitted) {
-      errorMessage = `Invalid permissions for ${method}`;
-    } else {
-      try {
-        result = this[`_${method}`](request.params);
-      } catch (err) {
-        errorMessage = err.message;
+    if (event === 'ready') return;
+    if (event === 'poll') {
+      return window.parent.postMessage('sync-storage:ready', message.origin);
+    }
+
+    try {
+      const permitted = this._permitted(message.origin, event);
+      if (permitted) {
+        result = this[`_${event}`](request.params);
+      } else {
+        errorMessage = `Invalid permissions for ${event}`;
       }
+    } catch (err) {
+      errorMessage = err.message;
     }
 
     const response = JSON.stringify({
       id: request.id,
       error: errorMessage,
-      result: result
+      result: result,
     });
 
     const targetOrigin = (message.origin === 'null') ? '*' : message.origin;
