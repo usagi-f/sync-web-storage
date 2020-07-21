@@ -59,7 +59,7 @@ export default class SyncStorageClient {
   private _createFrame = (url: string): HTMLIFrameElement => {
     const element = document.createElement('iframe');
     element.id = this.frameId;
-    // element.setAttribute('style', 'display:none;');
+    element.setAttribute('style', 'display:none;');
 
     document.body.appendChild(element);
     element.src = url;
