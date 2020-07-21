@@ -1,34 +1,4 @@
-type Method = 'get' | 'set' | 'del' | 'clear' | 'getKeys';
-type State = 'ready' | 'poll';
-type Event = Method | State;
-type EventKeys =
-  'sync-storage:get' |
-  'sync-storage:set' |
-  'sync-storage:del' |
-  'sync-storage:clear' |
-  'sync-storage:getKeys' |
-  'sync-storage:ready' |
-  'sync-storage:poll';
-
-type Permission = { origin: RegExp, allow: Method[] };
-type Permissions = Permission[];
-type KeyValueParams = { key: string; value: string };
-type KeyArrayParams = { keys: string[] };
-
-type Request = {
-  id: any;
-  method: EventKeys;
-  params: KeyValueParams | KeyArrayParams;
-};
-
-declare global {
-  interface Window {
-    attachEvent(event: string, listener: EventListener): boolean;
-    detachEvent(event: string, listener: EventListener): void;
-  }
-}
-
-const availableMethods: Method[] = ['get', 'set', 'del', 'clear', 'getKeys'];
+const availableMethods: Methods[] = ['get', 'set', 'del', 'clear', 'getKeys'];
 
 /**
  * @example
@@ -43,13 +13,13 @@ const availableMethods: Method[] = ['get', 'set', 'del', 'clear', 'getKeys'];
 
 export default class SyncStorageHub {
   private storage: Storage;
-  private permissions: Permissions;
+  private permissions: PermissionArray;
 
   constructor(storage: Storage) {
     this.storage = storage;
   }
 
-  public init(permissions: Permissions): void {
+  public init(permissions: PermissionArray): void {
     this.permissions = permissions || [];
     this._installListener();
     window.parent.postMessage('sync-storage:ready', '*');
@@ -66,16 +36,16 @@ export default class SyncStorageHub {
 
   private _listener(message: MessageEvent): void {
     let errorMessage: string;
-    let request: Request;
+    let messageData: MessageData;
     let result: Function;
 
     try {
-      request = JSON.parse(message.data);
+      messageData = JSON.parse(message.data);
     } catch (err) {
       return;
     }
 
-    const event = request.method.split('sync-storage:')[1] as Event;
+    const event = messageData.method.split('sync-storage:')[1];
     if (!event) return;
 
     if (event === 'ready') return;
@@ -84,9 +54,9 @@ export default class SyncStorageHub {
     }
 
     try {
-      const permitted = this._permitted(message.origin, event);
+      const permitted = this._permitted(message.origin, event as Methods);
       if (permitted) {
-        result = this[`_${event}`](request.params);
+        result = this[`_${event}`](messageData.params);
       } else {
         errorMessage = `Invalid permissions for ${event}`;
       }
@@ -95,7 +65,7 @@ export default class SyncStorageHub {
     }
 
     const response = JSON.stringify({
-      id: request.id,
+      id: messageData.id,
       error: errorMessage,
       result: result,
     });
@@ -105,7 +75,7 @@ export default class SyncStorageHub {
     window.parent.postMessage(response, targetOrigin);
   }
 
-  private _permitted(origin: string, method: Method): boolean {
+  private _permitted(origin: string, method: Methods): boolean {
     if (availableMethods.includes(method)) return false;
 
     this.permissions.forEach(permission => {
