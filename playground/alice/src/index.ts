@@ -13,22 +13,26 @@ const getKey1 = () => client.onConnect().then(() => {
 const getKey2 = () => client.onConnect().then(() => {
   client.get('key2').then((res) => alert(res));
 });
+const getKey1and2 = () => client.onConnect().then(() => {
+  client.get(['key1', 'key2']).then((res) => alert(res));
+});
 
-const clear = () => {
+const clearStorage = () => {
   client.onConnect().then(() => {
     client.clear();
   });
 };
 
+const set1 = document.getElementById('set1');
+const set2 = document.getElementById('set2');
+const get1 = document.getElementById('get1');
+const get2 = document.getElementById('get2');
+const get3 = document.getElementById('get3');
+const clear = document.getElementById('clear');
 
-const button1 = document.getElementById('button1');
-const button2 = document.getElementById('button2');
-const button3 = document.getElementById('button3');
-const button4 = document.getElementById('button4');
-const button5 = document.getElementById('button5');
-
-button1.addEventListener('click', setKey1);
-button2.addEventListener('click', setKey2);
-button3.addEventListener('click', getKey1);
-button4.addEventListener('click', getKey2);
-button5.addEventListener('click', clear);
+set1.addEventListener('click', setKey1);
+set2.addEventListener('click', setKey2);
+get1.addEventListener('click', getKey1);
+get2.addEventListener('click', getKey2);
+get3.addEventListener('click', getKey1and2);
+clear.addEventListener('click', clearStorage);

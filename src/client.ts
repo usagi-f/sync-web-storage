@@ -136,7 +136,7 @@ export default class SyncStorageClient {
     })
   }
 
-  private _request = (method: Methods, params?: any): Promise<any> => {
+  private _request = (method: Methods, params?: KeyValueParams | KeyArrayParams): Promise<any> => {
     if (this.closed) {
       return Promise.reject(new Error('CrossStorageClient has closed'));
     }
@@ -186,11 +186,13 @@ export default class SyncStorageClient {
   }
 
   public get = (key: string | string[]): Promise<string> => {
-    return this._request('get', { keys: [...key] });
+    const keys = typeof key === 'string' ? [key] : key;
+    return this._request('get', { keys });
   }
 
   public del = (key: string | string[]): Promise<void> => {
-    return this._request('del', { keys: [...key] });
+    const keys = typeof key === 'string' ? [key] : key;
+    return this._request('del', { keys });
   }
 
   public clear = (): Promise<void> => {
