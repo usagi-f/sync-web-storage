@@ -20,9 +20,13 @@ export default class SyncStorageHub {
   }
 
   public init(permissions: PermissionArray): void {
-    this.permissions = permissions || [];
-    this._installListener();
-    window.parent.postMessage('sync-storage:ready', '*');
+    if (this.storage) {
+      this.permissions = permissions || [];
+      this._installListener();
+      window.parent.postMessage('sync-storage:ready', '*');
+    } else {
+      window.parent.postMessage('sync-storage:unavailable', '*');
+    }
   }
 
   private _installListener(): void {

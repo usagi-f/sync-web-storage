@@ -1,5 +1,5 @@
 type Methods = 'get' | 'set' | 'del' | 'clear' | 'getKeys';
-type State = 'ready' | 'poll';
+type State = 'unavailable' | 'ready' | 'poll';
 type Events = Methods | State;
 type EventKeys =
   'sync-storage:get' |
