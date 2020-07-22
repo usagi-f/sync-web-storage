@@ -1,12 +1,16 @@
 {
-  "name": "sync-storage",
-  "version": "0.0.1",
+  "name": "sync-web-storage",
+  "version": "0.1.0",
   "description": "Cross domain storage",
   "main": "dist/index.js",
-  "homepage": "https://github.com/usagi-f/sync-storage",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/usagi-f/sync-web-storage",
   "repository": {
     "type": "git",
-    "url": "https://github.com/usagi-f/sync-storage.git"
+    "url": "https://github.com/usagi-f/sync-web-storage.git"
   },
   "author": "@usagi-f",
   "license": "Apache-2.0",
@@ -17,7 +21,7 @@
     "domain"
   ],
   "scripts": {
-    "build": "esbuild --bundle src/index.ts --minify --loader:.ts=ts --outdir=dist",
+    "build": "webpack src/index.ts",
     "playground:build:hub": "esbuild --bundle playground/hub/src/index.ts --loader:.ts=ts --outdir=playground/hub/dist",
     "playground:build:alice": "esbuild --bundle playground/alice/src/index.ts --loader:.ts=ts --outdir=playground/alice/dist",
     "playground:serve:hub": "serve playground/hub -p 3001",
@@ -27,8 +31,14 @@
     "uuid": "^8.2.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.10.5",
     "@types/uuid": "^8.0.0",
+    "babel-loader": "^8.1.0",
     "esbuild": "^0.6.5",
-    "serve": "^11.3.2"
+    "serve": "^11.3.2",
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
   }
 }

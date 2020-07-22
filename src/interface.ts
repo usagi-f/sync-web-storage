@@ -2,14 +2,14 @@ type Methods = 'get' | 'set' | 'del' | 'clear' | 'getKeys';
 type State = 'unavailable' | 'ready' | 'poll';
 type Events = Methods | State;
 type EventKeys =
-  'sync-storage:get' |
-  'sync-storage:set' |
-  'sync-storage:del' |
-  'sync-storage:clear' |
-  'sync-storage:getKeys' |
-  'sync-storage:unavailable' |
-  'sync-storage:ready' |
-  'sync-storage:poll';
+  'sync-web-storage:get' |
+  'sync-web-storage:set' |
+  'sync-web-storage:del' |
+  'sync-web-storage:clear' |
+  'sync-web-storage:getKeys' |
+  'sync-web-storage:unavailable' |
+  'sync-web-storage:ready' |
+  'sync-web-storage:poll';
 
 type Permission = { origin: RegExp, allow: Methods[] };
 type PermissionArray = Permission[];
@@ -20,7 +20,7 @@ type MessageId = string; // `${uuid}:${count}`
 type RequestData = {
   id: MessageId;
   method: EventKeys;
-  params: KeyValueParams | KeyArrayParams;
+  params?: KeyValueParams | KeyArrayParams;
 };
 type ResponseData = {
   id: MessageId;
@@ -36,6 +36,6 @@ type ClientOptions = {
 };
 
 interface  Window {
-  attachEvent(event: string, listener: EventListener): boolean;
-  detachEvent(event: string, listener: EventListener): void;
+  attachEvent(event: string, listener: (event: MessageEvent) => any): boolean;
+  detachEvent(event: string, listener: (event: MessageEvent) => any): void;
 }

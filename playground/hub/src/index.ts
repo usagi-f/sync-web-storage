@@ -1,6 +1,6 @@
-import SyncStorage from '../../../src/index';
+import SyncWebStorage from '../../../src/index';
 
-const syncStorageHub = new SyncStorage.hub(window.localStorage);
-syncStorageHub.init([
+const syncWebStorageHub = new SyncWebStorage.hub(window.localStorage);
+syncWebStorageHub.init([
   {origin: /.*localhost:300\d$/, allow: ['get', 'set', 'del', 'clear', 'getKeys']}
 ]);

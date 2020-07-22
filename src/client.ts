@@ -3,39 +3,39 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * @example
  * ```
- * const syncStorageClient = new SyncStorageClient('https://*.com/hub.html');
+ * const syncWebStorageClient = new SyncWebStorageClient('https://*.com/hub.html');
  * ```
  * @example
  * ```
- * const syncStorageClient = new SyncStorageClient('https://*.com/hub.html', {
+ * const syncWebStorageClient = new SyncWebStorageClient('https://*.com/hub.html', {
  *   timeout: 5000,
  * });
  * ```
  */
 
-export default class SyncStorageClient {
+export default class SyncWebStorageClient {
   private id: string;
   private frameId: string;
   private origin: string;
-  private requests: {connect: any[]};
+  private requests: any;
   private connected: boolean;
   private closed: boolean;
   private count: number;
   private timeout: number;
-  private listener: (message: MessageEvent) => void;
+  private listener: (event: MessageEvent) => void;
   private frame: HTMLIFrameElement;
-  private hub: Window;
+  private hub: Window | null;
 
   constructor(url: string, options?: ClientOptions) {
     this.id        = uuidv4();
-    this.frameId   = `SyncStorageClient-${this.id}`;
+    this.frameId   = `SyncWebStorageClient-${this.id}`;
     this.origin    = this._getOrigin(url);
     this.requests  = {connect: []};
     this.connected = false;
     this.closed    = false;
     this.count     = 0;
     this.timeout   = options?.timeout || 5000;
-    this.listener  = null;
+    this.listener  = () => {};
 
     this._installListener();
 
@@ -71,9 +71,10 @@ export default class SyncStorageClient {
       let response: ResponseData;
       let error: ResponseData['error'];
 
-      // newした時に設定したoriginではない場合は処理しない
+      // Do not process if not correct origin
       if (this.closed || message.origin !== this.origin) return;
-      if (message.data === 'sync-storage:unavailable') {
+
+      if (message.data === 'sync-web-storage:unavailable') {
         if (!this.closed) this.close();
         if (!this.requests.connect) return;
 
@@ -85,7 +86,7 @@ export default class SyncStorageClient {
       }
 
       // Initial connection
-      if (message.data.includes('sync-storage:') && !this.connected) {
+      if (message.data.includes('sync-web-storage:') && !this.connected) {
         this.connected = true;
         if (!this.requests.connect) return;
 
@@ -95,7 +96,7 @@ export default class SyncStorageClient {
         delete this.requests.connect;
       }
 
-      if (message.data === 'sync-storage:ready') return;
+      if (message.data === 'sync-web-storage:ready') return;
 
       try {
         response = JSON.parse(message.data);
@@ -120,12 +121,12 @@ export default class SyncStorageClient {
     if (this.connected) {
       return Promise.resolve();
     } else if (this.closed) {
-      return Promise.reject(new Error('SyncStorageClient has closed'));
+      return Promise.reject(new Error('SyncWebStorageClient has closed'));
     }
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error('SyncStorageClient could not connect'));
+        reject(new Error('SyncWebStorageClient could not connect'));
       }, this.timeout);
 
       this.requests.connect.push((err: Error) => {
@@ -145,7 +146,7 @@ export default class SyncStorageClient {
 
     const request: RequestData = {
       id: `${this.id}:${this.count}`,
-      method: `sync-storage:${method}` as EventKeys,
+      method: `sync-web-storage:${method}` as EventKeys,
       params,
     }
 
@@ -166,7 +167,7 @@ export default class SyncStorageClient {
 
       const targetOrigin = (this.origin === 'null') ? '*' : this.origin;
 
-      this.hub.postMessage(JSON.stringify(request), targetOrigin);
+      this.hub?.postMessage(JSON.stringify(request), targetOrigin);
     })
   }
 
@@ -205,9 +206,7 @@ export default class SyncStorageClient {
 
   public close = (): void => {
     const element = document.getElementById(this.frameId);
-    if (element) {
-      element.parentNode.removeChild(element);
-    }
+    element?.parentNode?.removeChild(element);
 
     if (window.removeEventListener) {
       window.removeEventListener('message', this.listener, false);
