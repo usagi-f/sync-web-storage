@@ -48,7 +48,9 @@ syncWebStorageClient.onConnect().then(() => {
 ```
 ## Installation
 
-WIP
+```bash
+$ npm i sync-web-storage
+```
 
 ## API
 
