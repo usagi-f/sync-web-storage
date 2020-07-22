@@ -20,7 +20,7 @@ type MessageId = string; // `${uuid}:${count}`
 type RequestData = {
   id: MessageId;
   method: EventKeys;
-  params: KeyValueParams | KeyArrayParams;
+  params?: KeyValueParams | KeyArrayParams;
 };
 type ResponseData = {
   id: MessageId;
@@ -36,6 +36,6 @@ type ClientOptions = {
 };
 
 interface  Window {
-  attachEvent(event: string, listener: EventListener): boolean;
-  detachEvent(event: string, listener: EventListener): void;
+  attachEvent(event: string, listener: (event: MessageEvent) => any): boolean;
+  detachEvent(event: string, listener: (event: MessageEvent) => any): void;
 }

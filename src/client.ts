@@ -17,14 +17,14 @@ export default class SyncWebStorageClient {
   private id: string;
   private frameId: string;
   private origin: string;
-  private requests: {connect: any[]};
+  private requests: any;
   private connected: boolean;
   private closed: boolean;
   private count: number;
   private timeout: number;
-  private listener: (message: MessageEvent) => void;
+  private listener: (event: MessageEvent) => void;
   private frame: HTMLIFrameElement;
-  private hub: Window;
+  private hub: Window | null;
 
   constructor(url: string, options?: ClientOptions) {
     this.id        = uuidv4();
@@ -35,7 +35,7 @@ export default class SyncWebStorageClient {
     this.closed    = false;
     this.count     = 0;
     this.timeout   = options?.timeout || 5000;
-    this.listener  = null;
+    this.listener  = () => {};
 
     this._installListener();
 
@@ -71,8 +71,9 @@ export default class SyncWebStorageClient {
       let response: ResponseData;
       let error: ResponseData['error'];
 
-      // newした時に設定したoriginではない場合は処理しない
+      // Do not process if not correct origin
       if (this.closed || message.origin !== this.origin) return;
+
       if (message.data === 'sync-web-storage:unavailable') {
         if (!this.closed) this.close();
         if (!this.requests.connect) return;
@@ -166,7 +167,7 @@ export default class SyncWebStorageClient {
 
       const targetOrigin = (this.origin === 'null') ? '*' : this.origin;
 
-      this.hub.postMessage(JSON.stringify(request), targetOrigin);
+      this.hub?.postMessage(JSON.stringify(request), targetOrigin);
     })
   }
 
@@ -205,9 +206,7 @@ export default class SyncWebStorageClient {
 
   public close = (): void => {
     const element = document.getElementById(this.frameId);
-    if (element) {
-      element.parentNode.removeChild(element);
-    }
+    element?.parentNode?.removeChild(element);
 
     if (window.removeEventListener) {
       window.removeEventListener('message', this.listener, false);

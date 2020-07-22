@@ -16,12 +16,13 @@ export default class SyncWebStorageHub {
 
   constructor(storage: Storage) {
     this.storage = storage;
+    this.permissions = [];
     this.availableMethods = ['get', 'set', 'del', 'clear', 'getKeys'];
   }
 
   public init = (permissions: PermissionArray): void => {
     if (this.storage) {
-      this.permissions = permissions || [];
+      this.permissions = permissions;
       this._installListener();
       window.parent.postMessage('sync-web-storage:ready', '*');
     } else {
@@ -39,7 +40,7 @@ export default class SyncWebStorageHub {
   }
 
   private _listener = (message: SyncMessageEvent): void => {
-    let errorMessage: string;
+    let errorMessage: string = '';
     let request: RequestData;
     let result: ResponseData['result'];
 
@@ -60,7 +61,9 @@ export default class SyncWebStorageHub {
     try {
       const permitted = this._permitted(message.origin, event as Methods);
       if (permitted) {
-        result = this[`_${event}`](request.params);
+        const methodName = `_${event as Methods}`;
+        // Really should avoid the bracket syntax. So temporarily enabled suppressImplicitAnyIndexErrors option in tsconfig.
+        result = this[methodName](request.params);
       } else {
         errorMessage = `Invalid permissions for ${event}`;
       }
@@ -92,7 +95,7 @@ export default class SyncWebStorageHub {
     this.storage.setItem(params.key, params.value);
   }
 
-  private _get = (params: KeyArrayParams): string | string[] => {
+  private _get = (params: KeyArrayParams): string | null | (string | null)[] => {
     const result = params.keys.map(key => {
       try {
         return this.storage.getItem(key);
@@ -113,7 +116,7 @@ export default class SyncWebStorageHub {
     this.storage.clear();
   };
 
-  private _getKeys = (): string[] => {
+  private _getKeys = (): (string | null)[] => {
     return [...Array(this.storage.length)].map((_, i) => this.storage.key(i));
   };
 }
