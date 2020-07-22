@@ -21,7 +21,9 @@ First, create an instance in the domain that actually holds Storage as Hub, and 
 After that, it initializes with the permissions setting(a definition of the origin and the methods) to make available.
 
 ```js
-const syncWebStorageHub = new SyncWebStorage.hub(window.localStorage);
+import { SyncWebStorageHub } from 'sync-web-storage';
+
+const syncWebStorageHub = new SyncWebStorageHub(window.localStorage);
 syncWebStorageHub.init([
   {origin: /\.example.com$/,            allow: ['get']},
   {origin: /:\/\/(www\.)?example.com$/, allow: ['get', 'set', 'del']}
@@ -34,7 +36,9 @@ Next, in the domain to be used as Client, generate an instance using the URL of 
 When you executing, the iframe will be inject to the document and you can share the value using the postMessage API. This iframe element is invisible (by CSS).
 
 ```js
-const syncWebStorageClient = new SyncWebStorage.client('https://store.example.com/hub.html');
+import { SyncWebStorageClient } from 'sync-web-storage';
+
+const syncWebStorageClient = new SyncWebStorageClient('https://store.example.com/hub.html');
 
 syncWebStorageClient.onConnect().then(() => {
   return client.set('Key', 'foobar');
@@ -54,16 +58,16 @@ $ npm i sync-web-storage
 
 ## API
 
-#### new SyncWebStorage.hub(Storage)
+#### new SyncWebStorageHub(Storage)
 
 Pass the Storage object and create an instance. An argument interface is Web Storage API.
 
 ```js
 // localStorage
-const syncWebStorageHub = new SyncWebStorage.hub(window.localStorage);
+const syncWebStorageHub = new SyncWebStorageHub(window.localStorage);
 
 // sessionStorage
-const syncWebStorageHub = new SyncWebStorage.hub(window.sessionStorage);
+const syncWebStorageHub = new SyncWebStorageHub(window.sessionStorage);
 ```
 
 #### syncWebStorageHub.init(permissions)
@@ -75,14 +79,14 @@ syncWebStorageHub.init([
 ]);
 ```
 
-#### new SyncWebStorage.client(url, [opts])
+#### new SyncWebStorageClient(url, [opts])
 
 Pass the HTML file of Hub. Optionally override the timeout setting for async processing. The initial value is `5000`. In the sync-web-storage, the option is only that.
 
 ```js
-const syncWebStorageClient = new SyncWebStorage.client('https://store.example.com/hub.html');
+const syncWebStorageClient = new SyncWebStorageClient('https://store.example.com/hub.html');
 
-const syncWebStorageClient = new SyncWebStorage.client('https://store.example.com/hub.html', {
+const syncWebStorageClient = new SyncWebStorageClient('https://store.example.com/hub.html', {
   timeout: 10000,
 });
 ```

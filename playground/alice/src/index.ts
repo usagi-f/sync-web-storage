@@ -1,6 +1,6 @@
-import SyncWebStorage from '../../../src/index';
+import { SyncWebStorageClient } from '../../../src/client';
 
-const syncWebStorageClient = new SyncWebStorage.client('http://localhost:3001/index.html');
+const syncWebStorageClient = new SyncWebStorageClient('http://localhost:3001/index.html');
 
 const setKey1 = () => syncWebStorageClient.onConnect().then(() => syncWebStorageClient.set('key1', 'foo'));
 const setKey2 = () => syncWebStorageClient.onConnect().then(() => syncWebStorageClient.set('key2', 'bar'));
