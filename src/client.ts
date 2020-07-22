@@ -73,7 +73,7 @@ export default class SyncStorageClient {
 
       // newした時に設定したoriginではない場合は処理しない
       if (this.closed || message.origin !== this.origin) return;
-      if (message.data === 'sync-storage:unavailable') {
+      if (message.data === 'sync-web-storage:unavailable') {
         if (!this.closed) this.close();
         if (!this.requests.connect) return;
 
@@ -85,7 +85,7 @@ export default class SyncStorageClient {
       }
 
       // Initial connection
-      if (message.data.includes('sync-storage:') && !this.connected) {
+      if (message.data.includes('sync-web-storage:') && !this.connected) {
         this.connected = true;
         if (!this.requests.connect) return;
 
@@ -95,7 +95,7 @@ export default class SyncStorageClient {
         delete this.requests.connect;
       }
 
-      if (message.data === 'sync-storage:ready') return;
+      if (message.data === 'sync-web-storage:ready') return;
 
       try {
         response = JSON.parse(message.data);
@@ -145,7 +145,7 @@ export default class SyncStorageClient {
 
     const request: RequestData = {
       id: `${this.id}:${this.count}`,
-      method: `sync-storage:${method}` as EventKeys,
+      method: `sync-web-storage:${method}` as EventKeys,
       params,
     }
 

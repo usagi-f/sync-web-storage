@@ -23,9 +23,9 @@ export default class SyncStorageHub {
     if (this.storage) {
       this.permissions = permissions || [];
       this._installListener();
-      window.parent.postMessage('sync-storage:ready', '*');
+      window.parent.postMessage('sync-web-storage:ready', '*');
     } else {
-      window.parent.postMessage('sync-storage:unavailable', '*');
+      window.parent.postMessage('sync-web-storage:unavailable', '*');
     }
   }
 
@@ -49,12 +49,12 @@ export default class SyncStorageHub {
       return;
     }
 
-    const event = request.method.split('sync-storage:')[1] as Events;
+    const event = request.method.split('sync-web-storage:')[1] as Events;
     if (!event) return;
 
     if (event === 'ready') return;
     if (event === 'poll') {
-      return window.parent.postMessage('sync-storage:ready', message.origin);
+      return window.parent.postMessage('sync-web-storage:ready', message.origin);
     }
 
     try {

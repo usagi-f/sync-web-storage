@@ -1,4 +1,4 @@
-# sync-storage
+# sync-web-storage
 
 Sharing a value at storage (e.g. local storage) between cross domains. You can work with same storage space from multiple client-side environments. with permissions.
 
@@ -6,7 +6,7 @@ This is a re-implementation of [zendesk/cross-storage](https://github.com/zendes
 Some interfaces have been changed but the basic structure is the same.
 Beased on the Apache-2.0 license, my purpose of this is to keep maintenance easy.
 
-Also, in the original library it was only local storage can be used, but the sync-storage injects the Storage interface when creating an instance, so it is theoretically possible to also use session storage.
+Also, in the original library it was only local storage can be used, but the sync-web-storage injects the Storage interface when creating an instance, so it is theoretically possible to also use session storage.
 
 ## Overview
 
@@ -75,7 +75,7 @@ syncStorageHub.init([
 
 #### new SyncStorage.client(url, [opts])
 
-Pass the HTML file of Hub. Optionally override the timeout setting for async processing. The initial value is `5000`. In the sync-storage, the option is only that.
+Pass the HTML file of Hub. Optionally override the timeout setting for async processing. The initial value is `5000`. In the sync-web-storage, the option is only that.
 
 ```js
 const syncStorageClient = new SyncStorage.client('https://store.example.com/hub.html');

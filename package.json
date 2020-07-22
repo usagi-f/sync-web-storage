@@ -1,12 +1,12 @@
 {
-  "name": "sync-storage",
+  "name": "sync-web-storage",
   "version": "0.0.1",
   "description": "Cross domain storage",
   "main": "dist/index.js",
-  "homepage": "https://github.com/usagi-f/sync-storage",
+  "homepage": "https://github.com/usagi-f/sync-web-storage",
   "repository": {
     "type": "git",
-    "url": "https://github.com/usagi-f/sync-storage.git"
+    "url": "https://github.com/usagi-f/sync-web-storage.git"
   },
   "author": "@usagi-f",
   "license": "Apache-2.0",
