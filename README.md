@@ -21,8 +21,8 @@ First, create an instance in the domain that actually holds Storage as Hub, and 
 After that, it initializes with the permissions setting(a definition of the origin and the methods) to make available.
 
 ```js
-const syncStorageHub = new SyncStorage.hub(window.localStorage);
-syncStorageHub.init([
+const syncWebStorageHub = new SyncWebStorage.hub(window.localStorage);
+syncWebStorageHub.init([
   {origin: /\.example.com$/,            allow: ['get']},
   {origin: /:\/\/(www\.)?example.com$/, allow: ['get', 'set', 'del']}
 ]);
@@ -34,9 +34,9 @@ Next, in the domain to be used as Client, generate an instance using the URL of 
 When you executing, the iframe will be inject to the document and you can share the value using the postMessage API. This iframe element is invisible (by CSS).
 
 ```js
-const syncStorageClient = new SyncStorage.client('https://store.example.com/hub.html');
+const syncWebStorageClient = new SyncWebStorage.client('https://store.example.com/hub.html');
 
-syncStorageClient.onConnect().then(() => {
+syncWebStorageClient.onConnect().then(() => {
   return client.set('Key', 'foobar');
 }).then(() => {
   return client.get('existingKey');
@@ -52,112 +52,112 @@ WIP
 
 ## API
 
-#### new SyncStorage.hub(Storage)
+#### new SyncWebStorage.hub(Storage)
 
 Pass the Storage object and create an instance. An argument interface is Web Storage API.
 
 ```js
 // localStorage
-const syncStorageHub = new SyncStorage.hub(window.localStorage);
+const syncWebStorageHub = new SyncWebStorage.hub(window.localStorage);
 
 // sessionStorage
-const syncStorageHub = new SyncStorage.hub(window.sessionStorage);
+const syncWebStorageHub = new SyncWebStorage.hub(window.sessionStorage);
 ```
 
-#### syncStorageHub.init(permissions)
+#### syncWebStorageHub.init(permissions)
 
 ```js
-syncStorageHub.init([
+syncWebStorageHub.init([
   {origin: /\.example.com$/,            allow: ['get']},
   {origin: /:\/\/(www\.)?example.com$/, allow: ['get', 'set', 'del']}
 ]);
 ```
 
-#### new SyncStorage.client(url, [opts])
+#### new SyncWebStorage.client(url, [opts])
 
 Pass the HTML file of Hub. Optionally override the timeout setting for async processing. The initial value is `5000`. In the sync-web-storage, the option is only that.
 
 ```js
-const syncStorageClient = new SyncStorage.client('https://store.example.com/hub.html');
+const syncWebStorageClient = new SyncWebStorage.client('https://store.example.com/hub.html');
 
-const syncStorageClient = new SyncStorage.client('https://store.example.com/hub.html', {
+const syncWebStorageClient = new SyncWebStorage.client('https://store.example.com/hub.html', {
   timeout: 10000,
 });
 ```
 
-#### syncStorageClient.onConnect()
+#### syncWebStorageClient.onConnect()
 
 A Promise will be returned when the connection with the Hub is established. This is to prevent requests from being sent before initialization.
 
 ```js
-syncStorageClient.onConnect().then(() => {
+syncWebStorageClient.onConnect().then(() => {
   // ready!
 });
 ```
 
-#### syncStorageClient.set(key, value)
+#### syncWebStorageClient.set(key, value)
 
 ```js
-syncStorageClient.onConnect().then(() => {
-  return syncStorageClient.set('key', JSON.stringify({foo: 'bar'}));
+syncWebStorageClient.onConnect().then(() => {
+  return syncWebStorageClient.set('key', JSON.stringify({foo: 'bar'}));
 });
 ```
 
-#### syncStorageClient.get(key)
+#### syncWebStorageClient.get(key)
 
 If you pass a string, you get a single value.
 
 Unlike cross-storage, if you want to get multiple values, please pass an array of strings without increasing the number of arguments.
 
 ```js
-syncStorageClient.onConnect().then(() => {
-  return syncStorageClient.get('key1');
+syncWebStorageClient.onConnect().then(() => {
+  return syncWebStorageClient.get('key1');
 }).then((res) => {
-  return syncStorageClient.get(['key1', 'key2', 'key3']);
+  return syncWebStorageClient.get(['key1', 'key2', 'key3']);
 }).then((res) => {
   // ...
 });
 ```
 
-#### syncStorageClient.del(key)
+#### syncWebStorageClient.del(key)
 
 Pass an array of strings if you want to delete multiple like a get method.
 
 ```js
-syncStorageClient.onConnect().then(() => {
-  return syncStorageClient.del(['key1', 'key2']);
+syncWebStorageClient.onConnect().then(() => {
+  return syncWebStorageClient.del(['key1', 'key2']);
 });
 ```
 
-#### syncStorageClient.getKeys()
+#### syncWebStorageClient.getKeys()
 
 ```js
-syncStorageClient.onConnect().then(() => {
-  return syncStorageClient.getKeys();
+syncWebStorageClient.onConnect().then(() => {
+  return syncWebStorageClient.getKeys();
 }).then((keys) => {
   // ['key1', 'key2', ...]
 });
 ```
 
-#### syncStorageClient.clear()
+#### syncWebStorageClient.clear()
 
 ```js
-syncStorageClient.onConnect().then(() => {
-  return syncStorageClient.clear();
+syncWebStorageClient.onConnect().then(() => {
+  return syncWebStorageClient.clear();
 });
 ```
 
-#### syncStorageClient.close()
+#### syncWebStorageClient.close()
 
 Disconnect, communication is stop and remove the iframe from the client. Storage cannot be reuse after it is closed.
 
 ```js
-syncStorageClient.onConnect().then(() => {
-  return syncStorageClient.set('key1', 'foo');
+syncWebStorageClient.onConnect().then(() => {
+  return syncWebStorageClient.set('key1', 'foo');
 }).catch((err) => {
   // Handle error
 }).then(() => {
-  syncStorageClient.close();
+  syncWebStorageClient.close();
 });
 ```
 

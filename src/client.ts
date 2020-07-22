@@ -3,17 +3,17 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * @example
  * ```
- * const syncStorageClient = new SyncStorageClient('https://*.com/hub.html');
+ * const syncWebStorageClient = new SyncWebStorageClient('https://*.com/hub.html');
  * ```
  * @example
  * ```
- * const syncStorageClient = new SyncStorageClient('https://*.com/hub.html', {
+ * const syncWebStorageClient = new SyncWebStorageClient('https://*.com/hub.html', {
  *   timeout: 5000,
  * });
  * ```
  */
 
-export default class SyncStorageClient {
+export default class SyncWebStorageClient {
   private id: string;
   private frameId: string;
   private origin: string;
@@ -28,7 +28,7 @@ export default class SyncStorageClient {
 
   constructor(url: string, options?: ClientOptions) {
     this.id        = uuidv4();
-    this.frameId   = `SyncStorageClient-${this.id}`;
+    this.frameId   = `SyncWebStorageClient-${this.id}`;
     this.origin    = this._getOrigin(url);
     this.requests  = {connect: []};
     this.connected = false;
@@ -120,12 +120,12 @@ export default class SyncStorageClient {
     if (this.connected) {
       return Promise.resolve();
     } else if (this.closed) {
-      return Promise.reject(new Error('SyncStorageClient has closed'));
+      return Promise.reject(new Error('SyncWebStorageClient has closed'));
     }
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error('SyncStorageClient could not connect'));
+        reject(new Error('SyncWebStorageClient could not connect'));
       }, this.timeout);
 
       this.requests.connect.push((err: Error) => {

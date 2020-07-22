@@ -1,15 +1,15 @@
 /**
  * @example
  * ```
- * const syncStorageHub = new SyncStorageHub(window.localStorage);
- * syncStorageHub.init([
+ * const syncWebStorageHub = new SyncWebStorageHub(window.localStorage);
+ * syncWebStorageHub.init([
  *   {origin: /\.example.com$/,        allow: ['get']},
  *   {origin: /:(www\.)?example.com$/, allow: ['get', 'set', 'del']}
  * ]);
  * ```
  */
 
-export default class SyncStorageHub {
+export default class SyncWebStorageHub {
   private storage: Storage;
   private permissions: PermissionArray;
   private availableMethods: Methods[];

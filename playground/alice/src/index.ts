@@ -1,25 +1,25 @@
-import SyncStorage from '../../../src/index';
+import SyncWebStorage from '../../../src/index';
 
-const client = new SyncStorage.client('http://localhost:3001/index.html');
+const syncWebStorageClient = new SyncWebStorage.client('http://localhost:3001/index.html');
 
-const setKey1 = () => client.onConnect().then(() => client.set('key1', 'foo'));
-const setKey2 = () => client.onConnect().then(() => client.set('key2', 'bar'));
-const getKey1 = () => client.onConnect().then(() => {
-  client.get('key1').then((res) => {
+const setKey1 = () => syncWebStorageClient.onConnect().then(() => syncWebStorageClient.set('key1', 'foo'));
+const setKey2 = () => syncWebStorageClient.onConnect().then(() => syncWebStorageClient.set('key2', 'bar'));
+const getKey1 = () => syncWebStorageClient.onConnect().then(() => {
+  syncWebStorageClient.get('key1').then((res) => {
     console.log(res)
     alert(res)
   });
 });
-const getKey2 = () => client.onConnect().then(() => {
-  client.get('key2').then((res) => alert(res));
+const getKey2 = () => syncWebStorageClient.onConnect().then(() => {
+  syncWebStorageClient.get('key2').then((res) => alert(res));
 });
-const getKey1and2 = () => client.onConnect().then(() => {
-  client.get(['key1', 'key2']).then((res) => alert(res));
+const getKey1and2 = () => syncWebStorageClient.onConnect().then(() => {
+  syncWebStorageClient.get(['key1', 'key2']).then((res) => alert(res));
 });
 
 const clearStorage = () => {
-  client.onConnect().then(() => {
-    client.clear();
+  syncWebStorageClient.onConnect().then(() => {
+    syncWebStorageClient.clear();
   });
 };
 
