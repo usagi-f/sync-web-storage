@@ -1,4 +1,2 @@
-import hub from './hub';
-import client from './client';
-
-export default { hub, client };
+export * from './hub';
+export * from './client';

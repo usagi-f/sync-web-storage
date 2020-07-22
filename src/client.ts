@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
  * ```
  */
 
-export default class SyncWebStorageClient {
+export class SyncWebStorageClient {
   private id: string;
   private frameId: string;
   private origin: string;

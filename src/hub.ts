@@ -9,7 +9,7 @@
  * ```
  */
 
-export default class SyncWebStorageHub {
+export class SyncWebStorageHub {
   private storage: Storage;
   private permissions: PermissionArray;
   private availableMethods: Methods[];

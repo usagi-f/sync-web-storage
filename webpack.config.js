@@ -6,7 +6,8 @@ module.exports = {
   output: {
     filename: 'index.js',
     path: path.join(__dirname, 'dist'),
-    libraryTarget: 'commonjs2'
+    library: 'sync-web-storage',
+    libraryTarget: 'umd',
   },
   module: {
     rules: [
